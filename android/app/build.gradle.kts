@@ -3,16 +3,20 @@ plugins {
     id("org.jetbrains.kotlin.android")
 }
 
+val appId = (project.findProperty("APPLICATION_ID") as String?) ?: "com.neche.cleanCalc"
+val versionCodeProp = (project.findProperty("VERSION_CODE") as String?)?.toIntOrNull() ?: 1
+val versionNameProp = (project.findProperty("VERSION_NAME") as String?) ?: "1.0.0"
+
 android {
     namespace = "com.neche.cleancalc"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.neche.cleanCalc"
+        applicationId = appId
         minSdk = 24
-        targetSdk = 34
-        versionCode = 1
-        versionName = "1.0.0"
+        targetSdk = 35
+        versionCode = versionCodeProp
+        versionName = versionNameProp
 
         vectorDrawables {
             useSupportLibrary = true
@@ -21,7 +25,9 @@ android {
 
     buildTypes {
         release {
+            isDebuggable = false
             isMinifyEnabled = false
+            isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
