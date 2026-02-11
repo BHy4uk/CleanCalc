@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlin.math.PI
 
 private const val GENERIC_ERROR = "Error"
 
@@ -53,6 +54,37 @@ class CalculatorViewModel(private val savedStateHandle: SavedStateHandle) : View
         updateExpression(expression, justEvaluated = false)
     }
 
+    fun onUnary(operation: UnaryOperation) = safeAction {
+        val current = _uiState.value
+        val value = resolveCurrentValue() ?: return@safeAction
+        val evaluation = CalculatorEngine.applyUnary(value, operation)
+        if (evaluation.error != null) {
+            updateState(current.copy(error = evaluation.error, justEvaluated = false))
+            return@safeAction
+        }
+        if (evaluation.result != null) {
+            updateState(
+                current.copy(
+                    expression = evaluation.result,
+                    result = evaluation.result,
+                    error = null,
+                    justEvaluated = true
+                )
+            )
+        }
+    }
+
+    fun onConstant(value: Double) = safeAction {
+        val current = _uiState.value
+        val base = if (current.justEvaluated) "" else current.expression
+        val expression = CalculatorEngine.insertConstant(base, value)
+        updateExpression(expression, justEvaluated = false)
+    }
+
+    fun onPi() = onConstant(PI)
+
+    fun onEuler() = onConstant(Math.E)
+
     fun onClear() = safeAction {
         updateState(CalculatorUiState())
     }
@@ -80,6 +112,20 @@ class CalculatorViewModel(private val savedStateHandle: SavedStateHandle) : View
                 )
             )
         }
+    }
+
+    private fun resolveCurrentValue(): Double? {
+        val current = _uiState.value
+        if (current.expression.isNotBlank() && CalculatorEngine.isExpressionComplete(current.expression)) {
+            val evaluation = CalculatorEngine.evaluate(current.expression)
+            if (evaluation.error != null) {
+                updateState(current.copy(error = evaluation.error, justEvaluated = false))
+                return null
+            }
+            val value = evaluation.result?.toDoubleOrNull()
+            if (value != null) return value
+        }
+        return current.result.toDoubleOrNull()
     }
 
     private fun updateExpression(expression: String, justEvaluated: Boolean) {
