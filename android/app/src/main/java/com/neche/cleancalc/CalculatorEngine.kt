@@ -1,17 +1,36 @@
 package com.neche.cleancalc
 
+import kotlin.math.cos
+import kotlin.math.ln
+import kotlin.math.log10
+import kotlin.math.pow
 import kotlin.math.roundToLong
+import kotlin.math.sin
+import kotlin.math.sqrt
+import kotlin.math.tan
 
 data class EvaluationResult(val result: String?, val error: String? = null)
 
+enum class UnaryOperation {
+    SIN,
+    COS,
+    TAN,
+    LN,
+    LOG10,
+    SQRT,
+    SQUARE,
+    RECIPROCAL,
+    PERCENT
+}
+
 object CalculatorEngine {
     const val MAX_INPUT_LENGTH = 24
-    private val operators = setOf('+', '-', '×', '÷')
+    private val operators = setOf('+', '-', '×', '÷', '^')
 
     fun formatExpression(expression: String): String {
         if (expression.isBlank()) return "0"
         return expression
-            .replace(Regex("""([+\-×÷])"""), " $1 ")
+            .replace(Regex("""([+\-×÷^])"""), " $1 ")
             .replace(Regex("""\s+"""), " ")
             .trim()
     }
@@ -47,6 +66,17 @@ object CalculatorEngine {
         }
     }
 
+    fun insertConstant(expression: String, constant: Double): String {
+        val constantText = formatResult(constant)
+        if (expression.isBlank()) return constantText
+        val lastChar = expression.last()
+        return if (isOperator(lastChar)) {
+            expression + constantText
+        } else {
+            constantText
+        }
+    }
+
     fun deleteLast(expression: String): String {
         return if (expression.isNotEmpty()) expression.dropLast(1) else ""
     }
@@ -57,12 +87,55 @@ object CalculatorEngine {
         return !isOperator(lastChar) && lastChar != '.'
     }
 
+    fun applyUnary(value: Double, operation: UnaryOperation): EvaluationResult {
+        return try {
+            val result = when (operation) {
+                UnaryOperation.SIN -> sin(Math.toRadians(value))
+                UnaryOperation.COS -> cos(Math.toRadians(value))
+                UnaryOperation.TAN -> {
+                    val radians = Math.toRadians(value)
+                    val cosValue = cos(radians)
+                    if (cosValue == 0.0 || cosValue.absoluteValue() < 1e-12) {
+                        return EvaluationResult(null, "Invalid input")
+                    }
+                    tan(radians)
+                }
+                UnaryOperation.LN -> {
+                    if (value <= 0.0) return EvaluationResult(null, "Invalid input")
+                    ln(value)
+                }
+                UnaryOperation.LOG10 -> {
+                    if (value <= 0.0) return EvaluationResult(null, "Invalid input")
+                    log10(value)
+                }
+                UnaryOperation.SQRT -> {
+                    if (value < 0.0) return EvaluationResult(null, "Invalid input")
+                    sqrt(value)
+                }
+                UnaryOperation.SQUARE -> value * value
+                UnaryOperation.RECIPROCAL -> {
+                    if (value == 0.0) return EvaluationResult(null, "Cannot divide by zero")
+                    1 / value
+                }
+                UnaryOperation.PERCENT -> value / 100.0
+            }
+
+            if (!result.isFinite()) {
+                EvaluationResult(null, "Invalid input")
+            } else {
+                EvaluationResult(formatResult(result))
+            }
+        } catch (_: Exception) {
+            EvaluationResult(null, "Invalid input")
+        }
+    }
+
     fun evaluate(expression: String): EvaluationResult {
         return try {
             val sanitized = sanitizeExpression(expression)
             if (sanitized.isBlank()) return EvaluationResult(null)
 
-            val tokenRegex = Regex("""(\d*\.\d+|\d+\.?\d*|[+\-×÷])""")
+            val tokenRegex = Regex("""(\d*\.\d+|\d+\.?\d*|[+\-×÷^])""")
             val rawTokens = tokenRegex.findAll(sanitized).map { it.value }.toList()
             if (rawTokens.isEmpty()) return EvaluationResult(null)
 
@@ -78,13 +151,35 @@ object CalculatorEngine {
                 return EvaluationResult(null)
             }
 
-            val firstPass = mutableListOf<String>()
+            val exponentPass = mutableListOf<String>()
             var index = 0
             while (index < tokens.size) {
                 val token = tokens[index]
+                if (token == "^") {
+                    val prevToken = exponentPass.removeLastOrNull()
+                    val nextToken = tokens.getOrNull(index + 1)
+                    if (prevToken == null || nextToken == null || !prevToken.isNumberToken() || !nextToken.isNumberToken()) {
+                        return EvaluationResult(null)
+                    }
+                    val baseValue = prevToken.toDouble()
+                    val exponentValue = nextToken.toDouble()
+                    val computed = baseValue.pow(exponentValue)
+                    if (!computed.isFinite()) return EvaluationResult(null, "Invalid input")
+                    exponentPass.add(computed.toString())
+                    index += 2
+                } else {
+                    exponentPass.add(token)
+                    index += 1
+                }
+            }
+
+            val firstPass = mutableListOf<String>()
+            index = 0
+            while (index < exponentPass.size) {
+                val token = exponentPass[index]
                 if (token == "*" || token == "/") {
                     val prevToken = firstPass.removeLastOrNull()
-                    val nextToken = tokens.getOrNull(index + 1)
+                    val nextToken = exponentPass.getOrNull(index + 1)
                     if (prevToken == null || nextToken == null || !prevToken.isNumberToken() || !nextToken.isNumberToken()) {
                         return EvaluationResult(null)
                     }
@@ -144,10 +239,12 @@ object CalculatorEngine {
     }
 
     private fun lastNumberSegment(expression: String): String {
-        return expression.split(Regex("""[+\-×÷]""")).lastOrNull() ?: ""
+        return expression.split(Regex("""[+\-×÷^]""")).lastOrNull() ?: ""
     }
 
     private fun isOperator(char: Char): Boolean = operators.contains(char)
 
     private fun String.isNumberToken(): Boolean = this.toDoubleOrNull() != null
+
+    private fun Double.absoluteValue(): Double = kotlin.math.abs(this)
 }
