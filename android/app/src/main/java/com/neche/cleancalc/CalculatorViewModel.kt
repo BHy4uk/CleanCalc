@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
+private const val GENERIC_ERROR = "Error"
+
 data class CalculatorUiState(
     val expression: String = "",
     val result: String = "0",
@@ -24,23 +26,23 @@ class CalculatorViewModel(private val savedStateHandle: SavedStateHandle) : View
     private val _uiState = MutableStateFlow(loadState())
     val uiState: StateFlow<CalculatorUiState> = _uiState.asStateFlow()
 
-    fun onDigit(digit: String) {
+    fun onDigit(digit: String) = safeAction {
         val current = _uiState.value
         val base = if (current.justEvaluated) "" else current.expression
-        if (base.length >= CalculatorEngine.MAX_INPUT_LENGTH) return
+        if (base.length >= CalculatorEngine.MAX_INPUT_LENGTH) return@safeAction
         val expression = CalculatorEngine.appendDigit(base, digit)
         updateExpression(expression, justEvaluated = false)
     }
 
-    fun onDecimal() {
+    fun onDecimal() = safeAction {
         val current = _uiState.value
         val base = if (current.justEvaluated) "" else current.expression
-        if (base.length >= CalculatorEngine.MAX_INPUT_LENGTH) return
+        if (base.length >= CalculatorEngine.MAX_INPUT_LENGTH) return@safeAction
         val expression = CalculatorEngine.appendDecimal(base)
         updateExpression(expression, justEvaluated = false)
     }
 
-    fun onOperator(operator: String) {
+    fun onOperator(operator: String) = safeAction {
         val current = _uiState.value
         val base = when {
             current.expression.isNotBlank() -> current.expression
@@ -51,22 +53,22 @@ class CalculatorViewModel(private val savedStateHandle: SavedStateHandle) : View
         updateExpression(expression, justEvaluated = false)
     }
 
-    fun onClear() {
+    fun onClear() = safeAction {
         updateState(CalculatorUiState())
     }
 
-    fun onDelete() {
+    fun onDelete() = safeAction {
         val expression = CalculatorEngine.deleteLast(_uiState.value.expression)
         updateExpression(expression, justEvaluated = false)
     }
 
-    fun onEquals() {
+    fun onEquals() = safeAction {
         val current = _uiState.value
-        if (current.expression.isBlank()) return
+        if (current.expression.isBlank()) return@safeAction
         val evaluation = CalculatorEngine.evaluate(current.expression)
         if (evaluation.error != null) {
             updateState(current.copy(error = evaluation.error, justEvaluated = false))
-            return
+            return@safeAction
         }
         if (evaluation.result != null) {
             updateState(
@@ -94,17 +96,29 @@ class CalculatorViewModel(private val savedStateHandle: SavedStateHandle) : View
     }
 
     private fun calculatePreview(expression: String, fallbackResult: String): PreviewResult {
-        if (expression.isBlank()) {
-            return PreviewResult("0", null)
+        return try {
+            if (expression.isBlank()) {
+                PreviewResult("0", null)
+            } else if (!CalculatorEngine.isExpressionComplete(expression)) {
+                PreviewResult(fallbackResult, null)
+            } else {
+                val evaluation = CalculatorEngine.evaluate(expression)
+                when {
+                    evaluation.error != null -> PreviewResult(fallbackResult, evaluation.error)
+                    evaluation.result != null -> PreviewResult(evaluation.result, null)
+                    else -> PreviewResult(fallbackResult, null)
+                }
+            }
+        } catch (_: Exception) {
+            PreviewResult(fallbackResult, GENERIC_ERROR)
         }
-        if (!CalculatorEngine.isExpressionComplete(expression)) {
-            return PreviewResult(fallbackResult, null)
-        }
-        val evaluation = CalculatorEngine.evaluate(expression)
-        return when {
-            evaluation.error != null -> PreviewResult(fallbackResult, evaluation.error)
-            evaluation.result != null -> PreviewResult(evaluation.result, null)
-            else -> PreviewResult(fallbackResult, null)
+    }
+
+    private fun safeAction(action: () -> Unit) {
+        try {
+            action()
+        } catch (_: Exception) {
+            updateState(CalculatorUiState(error = GENERIC_ERROR))
         }
     }
 
