@@ -11,8 +11,8 @@ object CalculatorEngine {
     fun formatExpression(expression: String): String {
         if (expression.isBlank()) return "0"
         return expression
-            .replace(Regex("([+\-×÷])"), " $1 ")
-            .replace(Regex("\s+"), " ")
+            .replace(Regex("""([+\-×÷])"""), " $1 ")
+            .replace(Regex("""\s+"""), " ")
             .trim()
     }
 
@@ -61,7 +61,7 @@ object CalculatorEngine {
         val sanitized = sanitizeExpression(expression)
         if (sanitized.isBlank()) return EvaluationResult(null)
 
-        val tokenRegex = Regex("(\d*\.\d+|\d+\.?\d*|[+\-×÷])")
+        val tokenRegex = Regex("""(\d*\.\d+|\d+\.?\d*|[+\-×÷])""")
         val rawTokens = tokenRegex.findAll(sanitized).map { it.value }.toList()
         if (rawTokens.isEmpty()) return EvaluationResult(null)
 
@@ -140,7 +140,7 @@ object CalculatorEngine {
     }
 
     private fun lastNumberSegment(expression: String): String {
-        return expression.split(Regex("[+\-×÷]")).lastOrNull() ?: ""
+        return expression.split(Regex("""[+\-×÷]""")).lastOrNull() ?: ""
     }
 
     private fun isOperator(char: Char): Boolean = operators.contains(char)
