@@ -317,12 +317,6 @@ export default function Index() {
         variant: "number",
         accessibilityLabel: "Decimal",
       },
-      {
-        label: "=",
-        onPress: handleEquals,
-        variant: "equals",
-        accessibilityLabel: "Equals",
-      },
     ],
   ];
 
