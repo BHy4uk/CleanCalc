@@ -79,7 +79,7 @@ export default function Index() {
           setError(parsed.error ?? "");
           setJustEvaluated(parsed.justEvaluated ?? false);
         }
-      } catch (loadError) {
+      } catch {
         setExpression("");
         setResult("0");
         setError("");
@@ -97,7 +97,7 @@ export default function Index() {
           STORAGE_KEY,
           JSON.stringify({ expression, result, error, justEvaluated })
         );
-      } catch (persistError) {
+      } catch {
         // Persistence failures should not block usage.
       }
     };
