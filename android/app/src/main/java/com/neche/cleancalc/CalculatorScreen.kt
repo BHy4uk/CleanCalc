@@ -32,18 +32,18 @@ fun CalculatorScreen(viewModel: CalculatorViewModel = viewModel()) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 20.dp, vertical = 16.dp)
+            .padding(horizontal = 20.dp, vertical = 12.dp)
     ) {
         Column(
             modifier = Modifier
-                .weight(0.4f)
+                .weight(0.32f)
                 .fillMaxWidth(),
             verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.End
         ) {
             Text(
                 text = CalculatorEngine.formatExpression(state.expression),
-                fontSize = 22.sp,
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
@@ -52,7 +52,7 @@ fun CalculatorScreen(viewModel: CalculatorViewModel = viewModel()) {
             Spacer(modifier = Modifier.height(6.dp))
             Text(
                 text = displayResult,
-                fontSize = 40.sp,
+                fontSize = 36.sp,
                 fontWeight = FontWeight.Bold,
                 color = if (state.error != null) MaterialTheme.colorScheme.error
                 else MaterialTheme.colorScheme.onBackground,
@@ -63,11 +63,29 @@ fun CalculatorScreen(viewModel: CalculatorViewModel = viewModel()) {
 
         Column(
             modifier = Modifier
-                .weight(0.6f)
+                .weight(0.68f)
                 .fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                CalculatorButton("sin", { viewModel.onUnary(UnaryOperation.SIN) }, modifier = Modifier.weight(1f))
+                CalculatorButton("cos", { viewModel.onUnary(UnaryOperation.COS) }, modifier = Modifier.weight(1f))
+                CalculatorButton("tan", { viewModel.onUnary(UnaryOperation.TAN) }, modifier = Modifier.weight(1f))
+                CalculatorButton("ln", { viewModel.onUnary(UnaryOperation.LN) }, modifier = Modifier.weight(1f))
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                CalculatorButton("log", { viewModel.onUnary(UnaryOperation.LOG10) }, modifier = Modifier.weight(1f))
+                CalculatorButton("√", { viewModel.onUnary(UnaryOperation.SQRT) }, modifier = Modifier.weight(1f))
+                CalculatorButton("x²", { viewModel.onUnary(UnaryOperation.SQUARE) }, modifier = Modifier.weight(1f))
+                CalculatorButton("^", { viewModel.onOperator("^") }, modifier = Modifier.weight(1f))
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                CalculatorButton("π", viewModel::onPi, modifier = Modifier.weight(1f))
+                CalculatorButton("e", viewModel::onEuler, modifier = Modifier.weight(1f))
+                CalculatorButton("%", { viewModel.onUnary(UnaryOperation.PERCENT) }, modifier = Modifier.weight(1f))
+                CalculatorButton("1/x", { viewModel.onUnary(UnaryOperation.RECIPROCAL) }, modifier = Modifier.weight(1f))
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 CalculatorButton(
                     label = "C",
                     onClick = viewModel::onClear,
@@ -133,7 +151,7 @@ fun CalculatorScreen(viewModel: CalculatorViewModel = viewModel()) {
                     modifier = Modifier.fillMaxWidth().weight(1f)
                 )
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 CalculatorButton(
                     label = "0",
                     onClick = { viewModel.onDigit("0") },
@@ -160,7 +178,7 @@ private fun CalculatorButton(
     Button(
         onClick = onClick,
         modifier = modifier
-            .height(64.dp),
+            .height(56.dp),
         shape = MaterialTheme.shapes.large,
         colors = ButtonDefaults.buttonColors(
             containerColor = containerColor,
@@ -170,7 +188,7 @@ private fun CalculatorButton(
     ) {
         Text(
             text = label,
-            fontSize = 22.sp,
+            fontSize = 18.sp,
             fontWeight = FontWeight.SemiBold
         )
     }
