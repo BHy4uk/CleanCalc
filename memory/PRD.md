@@ -1,23 +1,23 @@
-# CleanCalc PRD
+# CleanCalc PRD (Native Android)
 
 ## Problem Statement
-Build a production-ready, Play Store-compliant Android calculator app with a modern UI, robust arithmetic (including decimals and operator precedence), error handling, and state persistence.
+Deliver a production-ready, fully native Android calculator (Kotlin + Jetpack Compose) that is Play Store compliant, offline, and stable for internal testing.
 
 ## Architecture
-- **Frontend**: Expo (React Native, TypeScript), Expo Router (single screen)
-- **State Persistence**: AsyncStorage
-- **Backend**: FastAPI + MongoDB scaffold (not used by calculator)
+- **Native Android**: Kotlin + Jetpack Compose
+- **State Management**: ViewModel + SavedStateHandle
+- **No Backend**: Offline-only, no permissions
 
 ## Implemented Features
 - Basic arithmetic: addition, subtraction, multiplication, division
 - Decimal input with validation
-- Operator precedence (e.g., 5 + 5 × 2 = 20)
-- Clear (C) and delete last digit (⌫)
+- Operator precedence
+- Clear (C) and delete (⌫)
 - Separate input and result display
-- Division-by-zero handling with friendly error
-- State persistence across reload/minimize
+- Division by zero error handling
 - Light theme with optional dark mode
-- Play Store readiness (app id, versioning, no permissions, release guidance)
+- Zero-permission AndroidManifest
+- Play Store config: applicationId `com.neche.cleanCalc`, versionCode 1, versionName 1.0.0
 
 ## Backlog
 ### P0
@@ -25,8 +25,8 @@ Build a production-ready, Play Store-compliant Android calculator app with a mod
 
 ### P1
 - Add optional haptic feedback toggle
-- Add copy-to-clipboard for results
+- Add copy-to-clipboard for result
 
 ### P2
-- Add history tape (optional)
+- Add history tape
 - Add scientific mode toggle
