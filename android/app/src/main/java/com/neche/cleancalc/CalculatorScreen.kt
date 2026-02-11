@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.weight
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -92,76 +91,76 @@ fun CalculatorScreen(viewModel: CalculatorViewModel = viewModel()) {
                     onClick = viewModel::onClear,
                     containerColor = MaterialTheme.colorScheme.surfaceVariant,
                     contentColor = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.fillMaxWidth().weight(1f)
                 )
                 CalculatorButton(
                     label = "⌫",
                     onClick = viewModel::onDelete,
                     containerColor = MaterialTheme.colorScheme.surfaceVariant,
                     contentColor = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.fillMaxWidth().weight(1f)
                 )
                 CalculatorButton(
                     label = "÷",
                     onClick = { viewModel.onOperator("÷") },
                     containerColor = MaterialTheme.colorScheme.surfaceVariant,
                     contentColor = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.fillMaxWidth().weight(1f)
                 )
                 CalculatorButton(
                     label = "×",
                     onClick = { viewModel.onOperator("×") },
                     containerColor = MaterialTheme.colorScheme.surfaceVariant,
                     contentColor = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.fillMaxWidth().weight(1f)
                 )
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                CalculatorButton("7", { viewModel.onDigit("7") }, modifier = Modifier.weight(1f))
-                CalculatorButton("8", { viewModel.onDigit("8") }, modifier = Modifier.weight(1f))
-                CalculatorButton("9", { viewModel.onDigit("9") }, modifier = Modifier.weight(1f))
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                CalculatorButton("7", { viewModel.onDigit("7") }, modifier = Modifier.fillMaxWidth().weight(1f))
+                CalculatorButton("8", { viewModel.onDigit("8") }, modifier = Modifier.fillMaxWidth().weight(1f))
+                CalculatorButton("9", { viewModel.onDigit("9") }, modifier = Modifier.fillMaxWidth().weight(1f))
                 CalculatorButton(
                     label = "-",
                     onClick = { viewModel.onOperator("-") },
                     containerColor = MaterialTheme.colorScheme.surfaceVariant,
                     contentColor = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.fillMaxWidth().weight(1f)
                 )
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                CalculatorButton("4", { viewModel.onDigit("4") }, modifier = Modifier.weight(1f))
-                CalculatorButton("5", { viewModel.onDigit("5") }, modifier = Modifier.weight(1f))
-                CalculatorButton("6", { viewModel.onDigit("6") }, modifier = Modifier.weight(1f))
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                CalculatorButton("4", { viewModel.onDigit("4") }, modifier = Modifier.fillMaxWidth().weight(1f))
+                CalculatorButton("5", { viewModel.onDigit("5") }, modifier = Modifier.fillMaxWidth().weight(1f))
+                CalculatorButton("6", { viewModel.onDigit("6") }, modifier = Modifier.fillMaxWidth().weight(1f))
                 CalculatorButton(
                     label = "+",
                     onClick = { viewModel.onOperator("+") },
                     containerColor = MaterialTheme.colorScheme.surfaceVariant,
                     contentColor = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.fillMaxWidth().weight(1f)
                 )
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                CalculatorButton("1", { viewModel.onDigit("1") }, modifier = Modifier.weight(1f))
-                CalculatorButton("2", { viewModel.onDigit("2") }, modifier = Modifier.weight(1f))
-                CalculatorButton("3", { viewModel.onDigit("3") }, modifier = Modifier.weight(1f))
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                CalculatorButton("1", { viewModel.onDigit("1") }, modifier = Modifier.fillMaxWidth().weight(1f))
+                CalculatorButton("2", { viewModel.onDigit("2") }, modifier = Modifier.fillMaxWidth().weight(1f))
+                CalculatorButton("3", { viewModel.onDigit("3") }, modifier = Modifier.fillMaxWidth().weight(1f))
                 CalculatorButton(
                     label = "=",
                     onClick = viewModel::onEquals,
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.fillMaxWidth().weight(1f)
                 )
             }
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 CalculatorButton(
                     label = "0",
                     onClick = { viewModel.onDigit("0") },
-                    modifier = Modifier.weight(2f)
+                    modifier = Modifier.fillMaxWidth().weight(2f)
                 )
                 CalculatorButton(
                     label = ".",
                     onClick = viewModel::onDecimal,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.fillMaxWidth().weight(1f)
                 )
             }
         }
